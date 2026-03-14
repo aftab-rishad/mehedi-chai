@@ -11,6 +11,53 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import MehediHand from "@/public/mehedi-hand.jpg";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  const data = await get_req(id);
+
+  if (!data) {
+    return {
+      title: "মেহেদি রিকোয়েস্ট",
+    };
+  }
+
+  const title = `${data.name} তোমার কাছে মেহেদি চাইছে 😏`;
+  const description = `${data.name} এই ঈদের জন্য ${data.receiver_name} এর কাছে মেহেদি রিকোয়েস্ট পাঠিয়েছে। দেখো তো কিনে দাও কিনা! 💅`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://mehedichai.com/r/${id}`,
+      siteName: "MehediChai",
+      locale: "bn_BD",
+      type: "website",
+      images: [
+        {
+          url: "/og_image.png",
+          width: 1200,
+          height: 630,
+          alt: "Mehedi Request",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/og_image.png"],
+    },
+  };
+}
 
 async function ReqPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -38,15 +85,17 @@ async function ReqPage({ params }: { params: { id: string } }) {
             </span>
           </CardTitle>
           <CardDescription>
-            {data?.name} তোমার কাছে একটা ছোট ঈদের রিকোয়েস্ট পাঠিয়েছে 😌
+            <span className="font-bold text-white">{data?.name}</span> তোমার
+            কাছে একটা ছোট ঈদের রিকোয়েস্ট পাঠিয়েছে 😌
           </CardDescription>
         </CardHeader>
         <CardContent className="flex z-50 flex-col items-center text-center">
           <div className="text-start">
-            {data?.name} বলছে —
+            <span className="font-bold text-white">{data?.name}</span> বলছে —
             <br />
             <br />
-            {data?.receiver_name}, এই ঈদে আমার হাতে মেহেদি না থাকলে
+            <span className="font-bold text-white">{data?.receiver_name}</span>
+            , এই ঈদে আমার হাতে মেহেদি না থাকলে
             <br />
             আমার ঈদটা একটু sad হয়ে যাবে 😢
             <Image
